@@ -39,7 +39,6 @@ void createBalls() {
 
 
 void setup() {
-  // put your setup code here, to run once:
   createBalls();
   pixel.begin();
   Serial.begin(9600);
@@ -47,9 +46,6 @@ void setup() {
 
 // x from 0 to 15
 // y from 0 to 15
-
-// 239 = 15, 14
-// Know for calculating correct index;
 
 int getIndex(int x, int y) {
   int curX = (y % 2 == 0) ? x : 15 - x;
@@ -65,19 +61,23 @@ bool occupiedPixel(int x, int y) {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  // For detecting collisions between balls - not working because we are updating the objects in the list order
-  // However, when pixels are cleared, the states disappear, so then those above may move down thinking it is free
-  // Need better way to manage states - use occupiedPixel func
-
   pixel.clear();
-  Serial.println("New Iteration: ");
   for (int i = 0; i < NUM_OF_BALLS; i++) {
     int pixelNum = getIndex(objs[i].getX(), objs[i].getY());
     pixel.setPixelColor(pixelNum, pixel.Color(150, 0, 0));
-    Serial.println(pixel.getPixelColor(getIndex(objs[i].getX(), objs[i].getY()-1)));
     if (objs[i].getY() > 0 && !occupiedPixel(objs[i].getX(), objs[i].getY()-1)) objs[i].setY(objs[i].getY() - objs[i].getRate());
   }
   pixel.show();
   delay(100);
 }
+
+
+/* TODO:
+- Need to add movement across x-axis now
+  - Have both mx and my represented in class, as well as for collision and edge dection
+- Once x and y motion is established, along with collisions, can start thinking about representing different states on board
+- Need to think about obstacles, different colored balls, objects, etc.
+- Also, once base motion is complete, need to start integrating IMU data to be able to dictate movement of objects
+  - Challenges: Interpreting IMU data correctly, and then applying this "gravity" to motion of balls on LED board
+- May need more efficient method once pixel count grows
+*/
