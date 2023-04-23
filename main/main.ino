@@ -37,6 +37,30 @@ class Ball {
     uint32_t getColor() {return color;}
 };
 
+class Obstacle {
+  private:
+    int posx;
+    int posy;
+    uint32_t color;
+
+  public:
+    Obstacle() {}
+
+    Obstacle(int x, int y, uint32_t c) {
+      posx = x;
+      posy = y;
+      color = c;
+    }
+
+    int getX() {return posx;}
+    void setX(int x) {posx = x;}
+    int getY() {return posy;}
+    void setY(int y) {posy = y;}
+    uint32_t getColor() {return color;}
+};
+
+Obstacle obstacles[9];
+
 Ball objs[NUM_OF_BALLS]; 
 
 void createBalls() {
@@ -48,8 +72,26 @@ void createBalls() {
   }
 }
 
+void createObstacles() {
+  int xStart = 6;
+  int yStart = 6;
+  int x = xStart;
+  int y = yStart;
+  int index = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      obstacles[index] = Obstacle(x, y, pixel.Color(100, 100, 100));
+      x++;
+      index++;
+    }
+    x = xStart;
+    y++;
+  }
+}
+
 void setup() {
   createBalls();
+  createObstacles();
   pixel.begin();
   Serial.begin(9600);
 }
@@ -92,13 +134,21 @@ void loop() {
     int newY = objs[i].getY() - objs[i].getYRate();
     if (withinBounds(newX, newY) && !occupiedPixel(newX, newY)) {objs[i].setX(newX); objs[i].setY(newY);}
   }
+
+  for (int i = 0; i < 9; i++) {
+    int curIndex = getIndex(obstacles[i].getX(), obstacles[i].getY());
+    pixel.setPixelColor(curIndex, obstacles[i].getColor());
+  }
+  // Think about how to organize obstacles:
+  // - Have predetermined shapes (square, circle, triangle, etc.) that can be called and loaded onto board
+  // In future, have custom files that can be translated into objects
+  // Reorganize Object classe so it uses coords/inheritance rather than list of pixels for shape
   pixel.show();
   delay(100);
 }
 
 
 /* TODO:
-- Once x and y motion is established, along with collisions, can start thinking about representing different states on board
 - Need to think about obstacles, different colored balls, objects, etc.
 - Also, once base motion is complete, need to start integrating IMU data to be able to dictate movement of objects
   - Challenges: Interpreting IMU data correctly, and then applying this "gravity" to motion of balls on LED board
