@@ -1,11 +1,21 @@
 #include <Adafruit_NeoPixel.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_SSD1306.h>
+#include <Wire.h>
+
 #define PIN 12
+#define BUTTON 0
 
 #define NUM_OF_BALLS 15
 #define NUM_OF_LEDS 256
 
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(NUM_OF_LEDS, PIN, NEO_GRB+NEO_KHZ800);
 #define COLOR = pixel.Color(150, 0, 0)
+
+Adafruit_MPU6050 mpu;
+float accelX, accelY, accelZ, gyroX, gyroY, gyroZ, gyroXDiff, gyroYDiff, gyroZDiff, accXDiff, accYDiff, accZDiff;
+
+Adafruit_SSD1306 lcd(128, 64); // create display object
 
 class Ball {
   private:
@@ -63,6 +73,7 @@ Obstacle obstacles[9];
 
 Ball objs[NUM_OF_BALLS]; 
 
+// Combine create functions?
 void createBalls() {
   for (int i = 0; i < NUM_OF_BALLS; i++) {
     int xRate = 0, yRate = 0;
@@ -89,15 +100,64 @@ void createObstacles() {
   }
 }
 
+void calibrationFunc() {
+  int rounds = 500;
+  // Potentially have progress bar???
+  lcd.print("Calibrating accelerometer and gyroscope . . . ");
+  lcd.display();
+  float gX, gY, gZ, aX, aY, aZ;
+  for (int i = 0; i < rounds; i++) {
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
+    aX += a.acceleration.x;
+    aY += a.acceleration.y;
+    aZ += a.acceleration.z;
+    gX += g.gyro.x;
+    gY += g.gyro.y;
+    gZ += g.gyro.z;
+    delay(50);
+  }
+  gyroXDiff = gX/rounds;
+  gyroYDiff = gY/rounds;
+  gyroZDiff = gZ/rounds;
+  accXDiff = aX/rounds;
+  accYDiff = aY/rounds;
+  accZDiff = aZ/rounds;
+
+  lcd.clearDisplay();
+  lcd.setCursor(0, 0);
+  lcd.println("Calibration finished");
+  lcd.println("\nSimulation started!");
+  lcd.display();
+}
+
 void setup() {
   createBalls();
   createObstacles();
   pixel.begin();
   Serial.begin(9600);
-}
+  pinMode(BUTTON, INPUT_PULLUP);
 
-// x from 0 to 15
-// y from 0 to 15
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G); // set accelerometer range to +-8G
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG); // set gyro range to +- 500 deg/s
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ); // set filter bandwidth to 21 Hz
+
+  lcd.begin(SSD1306_SWITCHCAPVCC, 0x3C); // init
+  lcd.clearDisplay();
+  lcd.setTextColor(WHITE);
+  lcd.setTextSize(1);
+  lcd.setCursor(0, 0);
+
+  calibrationFunc();
+}
 
 int getIndex(int x, int y) {
   int curX = (y % 2 == 0) ? x : 15 - x;
@@ -124,33 +184,54 @@ void checkCollisions(int x, int y, Ball& ball) {
   }
 }
 
-void loop() {
-  pixel.clear();
-  for (int i = 0; i < NUM_OF_BALLS; i++) {
-    int pixelNum = getIndex(objs[i].getX(), objs[i].getY());
-    pixel.setPixelColor(pixelNum, objs[i].getColor());
-    checkCollisions(objs[i].getX(), objs[i].getY(), objs[i]);
-    int newX = objs[i].getX() - objs[i].getXRate();
-    int newY = objs[i].getY() - objs[i].getYRate();
-    if (withinBounds(newX, newY) && !occupiedPixel(newX, newY)) {objs[i].setX(newX); objs[i].setY(newY);}
-  }
+void accelGyroData() {
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
 
-  for (int i = 0; i < 9; i++) {
-    int curIndex = getIndex(obstacles[i].getX(), obstacles[i].getY());
-    pixel.setPixelColor(curIndex, obstacles[i].getColor());
-  }
-  // Think about how to organize obstacles:
-  // - Have predetermined shapes (square, circle, triangle, etc.) that can be called and loaded onto board
-  // In future, have custom files that can be translated into objects
-  // Reorganize Object classe so it uses coords/inheritance rather than list of pixels for shape
-  pixel.show();
-  delay(100);
+  accelX = a.acceleration.x - accXDiff;
+  accelY = a.acceleration.y - accYDiff;
+  accelZ = a.acceleration.z - accZDiff;
+
+  gyroX = g.gyro.x - gyroXDiff;
+  gyroY = g.gyro.y - gyroYDiff;
+  gyroZ = g.gyro.z - gyroZDiff;
+
+  Serial.println("Accelerometer data: ");
+  Serial.print("x: "); Serial.println(accelX);
+  Serial.print("y: "); Serial.println(accelY);
+  Serial.print("z: "); Serial.println(accelZ);
+
+  Serial.println("Gyroscope data: ");
+  Serial.print("x: "); Serial.println(gyroX);
+  Serial.print("y: "); Serial.println(gyroY);
+  Serial.print("z: "); Serial.println(gyroZ);
 }
 
+byte prev = 1;
+bool paused = false;
+unsigned long lastClick = 0;
+void loop() {
+  byte cur = digitalRead(BUTTON);
+  if (cur == 0 && prev == 1 && millis() > lastClick + 75) {paused = !paused; lastClick = millis();}
+  if (!paused) {
+    accelGyroData();
+    pixel.clear();
+    for (int i = 0; i < NUM_OF_BALLS; i++) {
+      int pixelNum = getIndex(objs[i].getX(), objs[i].getY());
+      pixel.setPixelColor(pixelNum, objs[i].getColor());
+      checkCollisions(objs[i].getX(), objs[i].getY(), objs[i]);
+      int newX = objs[i].getX() - objs[i].getXRate();
+      int newY = objs[i].getY() - objs[i].getYRate();
+      if (withinBounds(newX, newY) && !occupiedPixel(newX, newY)) {objs[i].setX(newX); objs[i].setY(newY);}
+    }
 
-/* TODO:
-- Need to think about obstacles, different colored balls, objects, etc.
-- Also, once base motion is complete, need to start integrating IMU data to be able to dictate movement of objects
-  - Challenges: Interpreting IMU data correctly, and then applying this "gravity" to motion of balls on LED board
-- May need more efficient method once pixel count grows
-*/
+    for (int i = 0; i < 9; i++) {
+      int curIndex = getIndex(obstacles[i].getX(), obstacles[i].getY());
+      pixel.setPixelColor(curIndex, obstacles[i].getColor());
+    }
+
+    pixel.show();
+    delay(100);
+  }
+  prev = cur;
+}
