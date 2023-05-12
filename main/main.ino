@@ -16,7 +16,7 @@ Adafruit_NeoPixel pixel = Adafruit_NeoPixel(NUM_OF_LEDS, PIN, NEO_GRB+NEO_KHZ800
 
 Adafruit_MPU6050 mpu;
 float accelX = 0, accelY = 0, accelZ = 0, gyroX = 0, gyroY = 0, gyroZ = 0, gyroXDiff = 0, gyroYDiff = 0, gyroZDiff = 0, accXDiff = 0, accYDiff = 0, accZDiff = 0;
-int matrix[HEIGHT * WIDTH];
+int matrix[HEIGHT * WIDTH] = {0};
 
 Adafruit_SSD1306 lcd(128, 64); // create display object
 
@@ -50,51 +50,94 @@ class Ball {
     uint32_t getColor() {return color;}
 };
 
-class Obstacle {
+class SquareObstacle {
   private:
-    int posx;
-    int posy;
+    int x;
+    int y;
+    int size;
     uint32_t color;
 
   public:
-    Obstacle() {}
+    SquareObstacle() {
+      x = 0;
+      y = 0;
+      size = 0;
+      color = 0;
+    }
 
-    Obstacle(int x, int y, uint32_t c) {
-      posx = x;
-      posy = y;
+    SquareObstacle(int xCoord, int yCoord, uint32_t c, int s) {
+      x = xCoord;
+      y = yCoord;
+      size = s;
       color = c;
     }
 
-    int getX() {return posx;}
-    void setX(int x) {posx = x;}
-    int getY() {return posy;}
-    void setY(int y) {posy = y;}
-    uint32_t getColor() {return color;}
-};
-
-class SquareObstacle : public Obstacle {
-  private:
-    int size;
-  
-  public:
-    SquareObstacle(int x, int y, uint32_t c, int s) : Obstacle(x, y, c), size(s) {
-
-    }
+    int getX() { return x; }
+    int getY() { return y; }
     int getSize() { return size; }
-    void setSize(int s) { size = s; }
+    uint32_t getColor() { return color; }
 };
 
-SquareObstacle obstacles[9] = {
-  SquareObstacle(6, 6, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(7, 6, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(8, 6, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(6, 7, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(7, 7, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(8, 7, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(6, 8, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(7, 8, pixel.Color(100, 100, 100), 3),
-  SquareObstacle(8, 8, pixel.Color(100, 100, 100), 3)
-};
+const int obstacleSize = 4; // Size of the obstacle (can be adjusted)
+const uint32_t obstacleColor = pixel.Color(100, 100, 100); // Color of the obstacle
+
+SquareObstacle obstacles[obstacleSize * obstacleSize];
+
+void createObstacles() {
+  int obstacleIndex = 0;
+  for (int y = 6; y <= 9; y++) {
+    for (int x = 6; x <= 9; x++) {
+      matrix[getIndex(x, y)] = 1;
+      obstacles[obstacleIndex] = SquareObstacle(x, y, obstacleColor, obstacleSize);
+      obstacleIndex++;
+    }
+  }
+}
+
+// class TriangleObstacle {
+// private:
+//   int x;
+//   int y;
+//   int size;
+//   uint32_t color;
+
+// public:
+//   TriangleObstacle() {
+//     x = 0;
+//     y = 0;
+//     size = 0;
+//     color = 0;
+//   }
+
+//   TriangleObstacle(int xCoord, int yCoord, uint32_t c, int s) {
+//     x = xCoord;
+//     y = yCoord;
+//     size = s;
+//     color = c;
+//   }
+
+//   int getX() { return x; }
+//   int getY() { return y; }
+//   int getSize() { return size; }
+//   uint32_t getColor() { return color; }
+// };
+
+// const int obstacleSize = 3;
+// const uint32_t obstacleColor = pixel.Color(100, 100, 100);
+
+// TriangleObstacle obstacles[(obstacleSize * (obstacleSize + 1)) / 2];
+
+// void createObstacles() {
+//   int index = 0;
+//   for (int y = 8 - obstacleSize / 2; y <= 8 + obstacleSize / 2; y++) {
+//     int startX = 8 - obstacleSize / 2;
+//     int endX = 8 + obstacleSize / 2 - (y - (8 - obstacleSize / 2));
+//     for (int x = startX; x <= endX; x++) {
+//       matrix[getIndex(x, y)] = 1;
+//       obstacles[index++] = TriangleObstacle(x, y, obstacleColor, obstacleSize);
+//     }
+//   }
+// }
 
 Ball balls[NUM_OF_BALLS]; 
 
@@ -103,7 +146,6 @@ int getIndex(int x, int y) {
   return curX + y*16;
 }
 
-// Combine create functions?
 void createBalls() {
   for (int i = 0; i < NUM_OF_BALLS; i++) {
     int xRate = 0, yRate = 0;
@@ -116,23 +158,23 @@ void createBalls() {
   }
 }
 
-void createObstacles() {
-  int xStart = 6;
-  int yStart = 6;
-  int x = xStart;
-  int y = yStart;
-  int index = 0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      matrix[getIndex(x, y)] = 1;
-      obstacles[index] = SquareObstacle(x, y, pixel.Color(100, 100, 100), 3);
-      x++;
-      index++;
-    }
-    x = xStart;
-    y++;
-  }
-}
+// void createObstacles() {
+//   int xStart = 6;
+//   int yStart = 6;
+//   int x = xStart;
+//   int y = yStart;
+//   int index = 0;
+//   for (int i = 0; i < 3; i++) {
+//     for (int j = 0; j < 3; j++) {
+//       matrix[getIndex(x, y)] = 1;
+//       obstacles[index] = SquareObstacle(x, y, pixel.Color(100, 100, 100), 3);
+//       x++;
+//       index++;
+//     }
+//     x = xStart;
+//     y++;
+//   }
+// }
 
 void calibrationFunc() {
   int rounds = 250;
@@ -181,8 +223,6 @@ void setup() {
   Serial.begin(9600);
   pinMode(BUTTON, INPUT_PULLUP);
 
-  
-
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
     while (1) {
@@ -219,11 +259,9 @@ void checkCollisions(Ball& ball) {
   int newX = x + ball.getXRate();
   int newY = y + ball.getYRate();
 
-  // Edge detection finally works
-
   if (newX > 15) {
     ball.setXRate(ball.getXRate() / -2);
-    newX = 15;
+    newX = WIDTH - 1;
   } else if (newX < 0) {
     ball.setXRate(ball.getXRate() / -2);
     newX = 0;
@@ -231,7 +269,7 @@ void checkCollisions(Ball& ball) {
 
   if (newY > 15) {
     ball.setYRate(ball.getYRate() / -2);
-    newY = 15;
+    newY = HEIGHT - 1;
   } else if (newY < 0) {
     ball.setYRate(ball.getYRate() / -2);
     newY = 0;
@@ -285,11 +323,6 @@ void checkCollisions(Ball& ball) {
         }
       }
     }
-  
-  // Think about:
-  // When updated, the states change so won't be updated correctly
-  // Red ball gets changed, so green thinks it can move forward
-  // So pause for one tick, so all directions are updated, then allow them to move
 
   matrix[oldIndex] = 0; 
   matrix[newIndex] = 1;
@@ -309,16 +342,6 @@ void accelGyroData() {
   gyroY = g.gyro.y - gyroYDiff;
   gyroZ = g.gyro.z - gyroZDiff;
 
-  Serial.println("Accelerometer data: ");
-  Serial.print("x: "); Serial.println(accelX);
-  Serial.print("y: "); Serial.println(accelY);
-  Serial.print("z: "); Serial.println(accelZ);
-
-  Serial.println("Gyroscope data: ");
-  Serial.print("x: "); Serial.println(gyroX);
-  Serial.print("y: "); Serial.println(gyroY);
-  Serial.print("z: "); Serial.println(gyroZ);
-
   // Resting: 0, 0, 9.8
   // Left: 0, -9.8, 0
   // Right: 0, 9.8, 0
@@ -334,20 +357,19 @@ void accelGyroData() {
   float mY = -az;
   mY -= ax / 2;
 
-  Serial.print(mX);
-  Serial.print(", ");
-  Serial.print(mY);
-  Serial.print(", ");
-  Serial.println(az);
-
   int16_t az2 = az * 2 + 1;
 
   if (mX != 0) mX /= abs(mX);
   if (mY != 0) mY /= abs(mY);
 
   for (int i = 0; i < NUM_OF_BALLS; i++) {
-    balls[i].setXRate(balls[i].getXRate() + mX);
-    balls[i].setYRate(balls[i].getYRate() + mY);
+    int randX, randY;
+    if (balls[i].getX() >= 8) randX = -0.08;
+    else randX = 0.08;
+    if (balls[i].getY() >= 8) randY = -0.08;
+    else randY = 0.08;
+    balls[i].setXRate(balls[i].getXRate() - mX + randX);
+    balls[i].setYRate(balls[i].getYRate() + mY + randY);
   }
 }
 
@@ -365,7 +387,7 @@ void loop() {
       drawPixel(balls[i]);
     }
 
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < pow(obstacleSize, 2); i++) {
       int curIndex = getIndex(obstacles[i].getX(), obstacles[i].getY());
       pixel.setPixelColor(curIndex, obstacles[i].getColor());
     }
@@ -375,10 +397,3 @@ void loop() {
   }
   prev = cur;
 }
-
-// Bugs:
-// Weird edge detection with x = 15 column - always read as occupied
-// Weird edge detection with y-values - when turned sideways, particles alternate bc each gap is read as occupied
-// Improve math for gravity and movement
-  // Specifically add randomness, like in library, so stacks can tumble rather than creating blockage
-// Continue improving collisions
