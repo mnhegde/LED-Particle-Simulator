@@ -4,7 +4,7 @@
 #include <Wire.h>
 
 #define PIN 12
-#define BUTTON 0
+#define BUTTON 6
 
 #define NUM_OF_BALLS 30
 #define NUM_OF_LEDS 256
@@ -84,74 +84,85 @@ public:
 };
 
 const int obstacleSize = 4;                                // Size of the obstacle (can be adjusted)
-const uint32_t obstacleColor = pixel.Color(100, 100, 100); // Color of the obstacle
+uint32_t obstacleColor; // Color of the obstacle
 
 SquareObstacle obstacles[obstacleSize * obstacleSize];
 
+int count = 0;
 void createObstacles()
 {
   int obstacleIndex = 0;
   for (int y = 6; y <= 9; y++)
   {
     for (int x = 6; x <= 9; x++)
-    {
+    { 
+
+      if(count <= 11) {
+        obstacleColor = pixel.Color(41, 24, 0);
+        }
+      else {
+        obstacleColor = pixel.Color(60, 105, 30);
+        }
       matrix[getIndex(x, y)] = 1;
       obstacles[obstacleIndex] = SquareObstacle(x, y, obstacleColor, obstacleSize);
       obstacleIndex++;
+      count++;
     }
   }
 }
 
-class TriangleObstacle
-{
-private:
-  int x;
-  int y;
-  int size;
-  uint32_t color;
+/* the following code pertains to Triangle Obstacle. to use a triangle obstacle, comment out all of square obstacle code. */
 
-public:
-  TriangleObstacle()
-  {
-    x = 0;
-    y = 0;
-    size = 0;
-    color = 0;
-  }
+// class TriangleObstacle
+// {
+// private:
+//   int x;
+//   int y;
+//   int size;
+//   uint32_t color;
 
-  TriangleObstacle(int xCoord, int yCoord, uint32_t c, int s)
-  {
-    x = xCoord;
-    y = yCoord;
-    size = s;
-    color = c;
-  }
+// public:
+//   TriangleObstacle()
+//   {
+//     x = 0;
+//     y = 0;
+//     size = 0;
+//     color = 0;
+//   }
 
-  int getX() { return x; }
-  int getY() { return y; }
-  int getSize() { return size; }
-  uint32_t getColor() { return color; }
-};
+//   TriangleObstacle(int xCoord, int yCoord, uint32_t c, int s)
+//   {
+//     x = xCoord;
+//     y = yCoord;
+//     size = s;
+//     color = c;
+//   }
 
-const int obstacleSize = 3;
-const uint32_t obstacleColor = pixel.Color(100, 100, 100);
+//   int getX() { return x; }
+//   int getY() { return y; }
+//   int getSize() { return size; }
+//   uint32_t getColor() { return color; }
+// };
 
-TriangleObstacle obstacles[(obstacleSize * (obstacleSize + 1)) / 2];
+// const int obstacleSize = 3;
+// const uint32_t obstacleColor = pixel.Color(100, 100, 100);
 
-void createObstacles()
-{
-  int index = 0;
-  for (int y = 8 - obstacleSize / 2; y <= 8 + obstacleSize / 2; y++)
-  {
-    int startX = 8 - obstacleSize / 2;
-    int endX = 8 + obstacleSize / 2 - (y - (8 - obstacleSize / 2));
-    for (int x = startX; x <= endX; x++)
-    {
-      matrix[getIndex(x, y)] = 1;
-      obstacles[index++] = TriangleObstacle(x, y, obstacleColor, obstacleSize);
-    }
-  }
-}
+// TriangleObstacle obstacles[(obstacleSize * (obstacleSize + 1)) / 2];
+
+// void createObstacles()
+// {
+//   int index = 0;
+//   for (int y = 8 - obstacleSize / 2; y <= 8 + obstacleSize / 2; y++)
+//   {
+//     int startX = 8 - obstacleSize / 2;
+//     int endX = 8 + obstacleSize / 2 - (y - (8 - obstacleSize / 2));
+//     for (int x = startX; x <= endX; x++)
+//     {
+//       matrix[getIndex(x, y)] = 1;
+//       obstacles[index++] = TriangleObstacle(x, y, obstacleColor, obstacleSize);
+//     }
+//   }
+// }
 
 Ball balls[NUM_OF_BALLS];
 
@@ -177,12 +188,126 @@ void createBalls()
   }
 }
 
+void calibratingLetters() {
+  uint32_t fontColor = pixel.Color(75, 0, 100);
+  uint32_t arrowColor = pixel.Color(100, 100, 100);
+
+  pixel.setPixelColor(254, fontColor);
+  pixel.setPixelColor(225, fontColor);
+  pixel.setPixelColor(222, fontColor);
+  pixel.setPixelColor(193, fontColor);
+  pixel.setPixelColor(190, fontColor);
+  pixel.setPixelColor(189, fontColor);
+  pixel.setPixelColor(188, fontColor); //L
+  
+  pixel.setPixelColor(250, fontColor);
+  pixel.setPixelColor(229, fontColor);
+  pixel.setPixelColor(218, fontColor);
+  pixel.setPixelColor(197, fontColor);
+  pixel.setPixelColor(186, fontColor);
+  pixel.setPixelColor(185, fontColor);
+  pixel.setPixelColor(184, fontColor);
+  pixel.setPixelColor(183, fontColor);
+  pixel.setPixelColor(200, fontColor);
+  pixel.setPixelColor(215, fontColor);
+  pixel.setPixelColor(232, fontColor);
+  pixel.setPixelColor(247, fontColor);
+  pixel.setPixelColor(248, fontColor);
+  pixel.setPixelColor(249, fontColor); //O
+
+  pixel.setPixelColor(245, fontColor);
+  pixel.setPixelColor(234, fontColor);
+  pixel.setPixelColor(213, fontColor);
+  pixel.setPixelColor(202, fontColor); 
+  pixel.setPixelColor(185, fontColor);
+  pixel.setPixelColor(244, fontColor);
+  pixel.setPixelColor(212, fontColor);
+  pixel.setPixelColor(243, fontColor);
+  pixel.setPixelColor(211, fontColor);
+  pixel.setPixelColor(242, fontColor); 
+  pixel.setPixelColor(237, fontColor);
+  pixel.setPixelColor(210, fontColor);
+  pixel.setPixelColor(205, fontColor);
+  pixel.setPixelColor(181, fontColor);
+  pixel.setPixelColor(178, fontColor); //A
+
+  pixel.setPixelColor(159, fontColor);
+  pixel.setPixelColor(158, fontColor);
+  pixel.setPixelColor(157, fontColor);
+  pixel.setPixelColor(128, fontColor); 
+  pixel.setPixelColor(131, fontColor);
+  pixel.setPixelColor(127, fontColor);
+  pixel.setPixelColor(124, fontColor);
+  pixel.setPixelColor(96, fontColor);
+  pixel.setPixelColor(99, fontColor);
+  pixel.setPixelColor(95, fontColor); 
+  pixel.setPixelColor(94, fontColor);
+  pixel.setPixelColor(93, fontColor); //D
+
+  pixel.setPixelColor(154, fontColor);
+  pixel.setPixelColor(133, fontColor);
+  pixel.setPixelColor(122, fontColor);
+  pixel.setPixelColor(101, fontColor); 
+  pixel.setPixelColor(90, fontColor); //I
+
+  pixel.setPixelColor(152, fontColor);
+  pixel.setPixelColor(135, fontColor);
+  pixel.setPixelColor(120, fontColor);
+  pixel.setPixelColor(103, fontColor); 
+  pixel.setPixelColor(88, fontColor);
+  pixel.setPixelColor(136, fontColor);
+  pixel.setPixelColor(118, fontColor);
+  pixel.setPixelColor(149, fontColor);
+  pixel.setPixelColor(138, fontColor);
+  pixel.setPixelColor(117, fontColor); 
+  pixel.setPixelColor(106, fontColor);
+  pixel.setPixelColor(85, fontColor); //N 
+
+  pixel.setPixelColor(147, fontColor);
+  pixel.setPixelColor(146, fontColor);
+  pixel.setPixelColor(145, fontColor);
+  pixel.setPixelColor(144, fontColor); 
+  pixel.setPixelColor(140, fontColor);
+  pixel.setPixelColor(115, fontColor);
+  pixel.setPixelColor(108, fontColor);
+  pixel.setPixelColor(83, fontColor);
+  pixel.setPixelColor(82, fontColor);
+  pixel.setPixelColor(81, fontColor); 
+  pixel.setPixelColor(80, fontColor);
+  pixel.setPixelColor(111, fontColor);
+  pixel.setPixelColor(112, fontColor); 
+  pixel.setPixelColor(113, fontColor); //G 
+
+  pixel.setPixelColor(68, arrowColor);
+  pixel.setPixelColor(59, arrowColor);
+  pixel.setPixelColor(36, arrowColor);
+  pixel.setPixelColor(34, arrowColor); 
+  pixel.setPixelColor(38, arrowColor);
+  pixel.setPixelColor(28, arrowColor);
+  pixel.setPixelColor(27, arrowColor);
+  pixel.setPixelColor(26, arrowColor);   
+  pixel.setPixelColor(4, arrowColor);  //left arrow  
+
+  pixel.setPixelColor(75, arrowColor);
+  pixel.setPixelColor(52, arrowColor);
+  pixel.setPixelColor(43, arrowColor);
+  pixel.setPixelColor(41, arrowColor); 
+  pixel.setPixelColor(45, arrowColor);
+  pixel.setPixelColor(21, arrowColor);
+  pixel.setPixelColor(20, arrowColor);
+  pixel.setPixelColor(19, arrowColor);   
+  pixel.setPixelColor(11, arrowColor);  //right arrow  
+
+  pixel.show();  
+}
+
 void calibrationFunc()
 {
   int rounds = 250;
   // Potentially have progress bar???
-  lcd.print("Calibrating accelerometer and gyroscope . . . ");
-  lcd.display();
+
+  calibratingLetters();
+
   float gX = 0, gY = 0, gZ = 0, aX = 0, aY = 0, aZ = 0;
   for (int i = 0; i < rounds; i++)
   {
@@ -203,14 +328,40 @@ void calibrationFunc()
   accYDiff = aY / rounds;
   accZDiff = aZ / rounds - 9.80;
 
-  lcd.clearDisplay();
-  lcd.setCursor(0, 0);
-  lcd.println("Calibration finished");
-  delay(100);
-  lcd.clearDisplay();
-  lcd.setCursor(0, 0);
-  lcd.println("\nSimulation started!");
-  lcd.display();
+  // int fLetters[8][5] = {
+  //   {5, 4, 3, 2, 1},    // F
+  //   {6, 7, 8, 9, 10},    // I
+  //   {21, 20, 19, 18, 17},   // N
+  //   {22, 23, 24, 25, 26},   // I
+  //   {37, 36, 35, 34, 33},   // S
+  //   {38, 39, 40, 41, 42},   // H
+  //   {53, 52, 51, 50, 49},   // E
+  //   {54, 55, 56, 57, 58}    // D
+  // };
+
+  // pixel.clear();
+
+  // for (int i = 0; i < 8; i++)
+  // {
+  //   for (int j = 0; j < 5; j++)
+  //   {
+  //     int index;
+  //     if (i % 2 == 0)
+  //     {
+  //       index = fLetters[i][j];
+  //     }
+  //     else
+  //     {
+  //       index = 15 - fLetters[i][j];
+  //     }
+  //     pixel.setPixelColor(index, color);
+  //   }
+  // }
+  pixel.show();
+
+  delay(4000);
+  
+  pixel.clear();
 }
 
 void drawPixel(Ball &ball)
@@ -222,7 +373,6 @@ void drawPixel(Ball &ball)
 void setup()
 {
   pixel.setBrightness(50);
-  createBalls();
   createObstacles();
   pixel.begin();
   Serial.begin(9600);
@@ -254,6 +404,8 @@ void setup()
   }
 
   calibrationFunc();
+
+  createBalls();
 }
 
 bool withinBounds(int x, int y)
@@ -419,7 +571,7 @@ unsigned long lastClick = 0;
 void loop()
 {
   byte cur = digitalRead(BUTTON);
-  if (cur == 0 && prev == 1 && millis() > lastClick + 75)
+  if (cur == 0 && prev == 1 && millis() > lastClick + 150)
   {
     paused = !paused;
     lastClick = millis();
