@@ -83,8 +83,8 @@ public:
   uint32_t getColor() { return color; }
 };
 
-const int obstacleSize = 4;                                // Size of the obstacle (can be adjusted)
-uint32_t obstacleColor; // Color of the obstacle
+const int obstacleSize = 4; // Size of the obstacle (can be adjusted)
+uint32_t obstacleColor;     // Color of the obstacle
 
 SquareObstacle obstacles[obstacleSize * obstacleSize];
 
@@ -95,14 +95,16 @@ void createObstacles()
   for (int y = 6; y <= 9; y++)
   {
     for (int x = 6; x <= 9; x++)
-    { 
+    {
 
-      if(count <= 11) {
+      if (count <= 11)
+      {
         obstacleColor = pixel.Color(41, 24, 0);
-        }
-      else {
+      }
+      else
+      {
         obstacleColor = pixel.Color(60, 105, 30);
-        }
+      }
       matrix[getIndex(x, y)] = 1;
       obstacles[obstacleIndex] = SquareObstacle(x, y, obstacleColor, obstacleSize);
       obstacleIndex++;
@@ -188,7 +190,8 @@ void createBalls()
   }
 }
 
-void calibratingLetters() {
+void calibratingLetters()
+{
   uint32_t fontColor = pixel.Color(75, 0, 100);
   uint32_t arrowColor = pixel.Color(100, 100, 100);
 
@@ -198,8 +201,8 @@ void calibratingLetters() {
   pixel.setPixelColor(193, fontColor);
   pixel.setPixelColor(190, fontColor);
   pixel.setPixelColor(189, fontColor);
-  pixel.setPixelColor(188, fontColor); //L
-  
+  pixel.setPixelColor(188, fontColor); // L
+
   pixel.setPixelColor(250, fontColor);
   pixel.setPixelColor(229, fontColor);
   pixel.setPixelColor(218, fontColor);
@@ -213,92 +216,92 @@ void calibratingLetters() {
   pixel.setPixelColor(232, fontColor);
   pixel.setPixelColor(247, fontColor);
   pixel.setPixelColor(248, fontColor);
-  pixel.setPixelColor(249, fontColor); //O
+  pixel.setPixelColor(249, fontColor); // O
 
   pixel.setPixelColor(245, fontColor);
   pixel.setPixelColor(234, fontColor);
   pixel.setPixelColor(213, fontColor);
-  pixel.setPixelColor(202, fontColor); 
+  pixel.setPixelColor(202, fontColor);
   pixel.setPixelColor(185, fontColor);
   pixel.setPixelColor(244, fontColor);
   pixel.setPixelColor(212, fontColor);
   pixel.setPixelColor(243, fontColor);
   pixel.setPixelColor(211, fontColor);
-  pixel.setPixelColor(242, fontColor); 
+  pixel.setPixelColor(242, fontColor);
   pixel.setPixelColor(237, fontColor);
   pixel.setPixelColor(210, fontColor);
   pixel.setPixelColor(205, fontColor);
   pixel.setPixelColor(181, fontColor);
-  pixel.setPixelColor(178, fontColor); //A
+  pixel.setPixelColor(178, fontColor); // A
 
   pixel.setPixelColor(159, fontColor);
   pixel.setPixelColor(158, fontColor);
   pixel.setPixelColor(157, fontColor);
-  pixel.setPixelColor(128, fontColor); 
+  pixel.setPixelColor(128, fontColor);
   pixel.setPixelColor(131, fontColor);
   pixel.setPixelColor(127, fontColor);
   pixel.setPixelColor(124, fontColor);
   pixel.setPixelColor(96, fontColor);
   pixel.setPixelColor(99, fontColor);
-  pixel.setPixelColor(95, fontColor); 
+  pixel.setPixelColor(95, fontColor);
   pixel.setPixelColor(94, fontColor);
-  pixel.setPixelColor(93, fontColor); //D
+  pixel.setPixelColor(93, fontColor); // D
 
   pixel.setPixelColor(154, fontColor);
   pixel.setPixelColor(133, fontColor);
   pixel.setPixelColor(122, fontColor);
-  pixel.setPixelColor(101, fontColor); 
-  pixel.setPixelColor(90, fontColor); //I
+  pixel.setPixelColor(101, fontColor);
+  pixel.setPixelColor(90, fontColor); // I
 
   pixel.setPixelColor(152, fontColor);
   pixel.setPixelColor(135, fontColor);
   pixel.setPixelColor(120, fontColor);
-  pixel.setPixelColor(103, fontColor); 
+  pixel.setPixelColor(103, fontColor);
   pixel.setPixelColor(88, fontColor);
   pixel.setPixelColor(136, fontColor);
   pixel.setPixelColor(118, fontColor);
   pixel.setPixelColor(149, fontColor);
   pixel.setPixelColor(138, fontColor);
-  pixel.setPixelColor(117, fontColor); 
+  pixel.setPixelColor(117, fontColor);
   pixel.setPixelColor(106, fontColor);
-  pixel.setPixelColor(85, fontColor); //N 
+  pixel.setPixelColor(85, fontColor); // N
 
   pixel.setPixelColor(147, fontColor);
   pixel.setPixelColor(146, fontColor);
   pixel.setPixelColor(145, fontColor);
-  pixel.setPixelColor(144, fontColor); 
+  pixel.setPixelColor(144, fontColor);
   pixel.setPixelColor(140, fontColor);
   pixel.setPixelColor(115, fontColor);
   pixel.setPixelColor(108, fontColor);
   pixel.setPixelColor(83, fontColor);
   pixel.setPixelColor(82, fontColor);
-  pixel.setPixelColor(81, fontColor); 
+  pixel.setPixelColor(81, fontColor);
   pixel.setPixelColor(80, fontColor);
   pixel.setPixelColor(111, fontColor);
-  pixel.setPixelColor(112, fontColor); 
-  pixel.setPixelColor(113, fontColor); //G 
+  pixel.setPixelColor(112, fontColor);
+  pixel.setPixelColor(113, fontColor); // G
 
   pixel.setPixelColor(68, arrowColor);
   pixel.setPixelColor(59, arrowColor);
   pixel.setPixelColor(36, arrowColor);
-  pixel.setPixelColor(34, arrowColor); 
+  pixel.setPixelColor(34, arrowColor);
   pixel.setPixelColor(38, arrowColor);
   pixel.setPixelColor(28, arrowColor);
   pixel.setPixelColor(27, arrowColor);
-  pixel.setPixelColor(26, arrowColor);   
-  pixel.setPixelColor(4, arrowColor);  //left arrow  
+  pixel.setPixelColor(26, arrowColor);
+  pixel.setPixelColor(4, arrowColor); // left arrow
 
   pixel.setPixelColor(75, arrowColor);
   pixel.setPixelColor(52, arrowColor);
   pixel.setPixelColor(43, arrowColor);
-  pixel.setPixelColor(41, arrowColor); 
+  pixel.setPixelColor(41, arrowColor);
   pixel.setPixelColor(45, arrowColor);
   pixel.setPixelColor(21, arrowColor);
   pixel.setPixelColor(20, arrowColor);
-  pixel.setPixelColor(19, arrowColor);   
-  pixel.setPixelColor(11, arrowColor);  //right arrow  
+  pixel.setPixelColor(19, arrowColor);
+  pixel.setPixelColor(11, arrowColor); // right arrow
 
-  pixel.show();  
+  pixel.show();
 }
 
 void calibrationFunc()
@@ -357,10 +360,9 @@ void calibrationFunc()
   //     pixel.setPixelColor(index, color);
   //   }
   // }
-  pixel.show();
 
+  pixel.show();
   delay(4000);
-  
   pixel.clear();
 }
 
@@ -404,13 +406,7 @@ void setup()
   }
 
   calibrationFunc();
-
   createBalls();
-}
-
-bool withinBounds(int x, int y)
-{
-  return x >= 0 && x <= 15 && y >= 0 && y <= 15 ? true : false;
 }
 
 void checkCollisions(Ball &ball)
